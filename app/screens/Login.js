@@ -1,19 +1,48 @@
 import React from "react";
-import { View, Text, StyleSheet, SafeAreaView } from "react-native";
-import { FONTS } from "../constants/theme";
+import { View, Text, StyleSheet, SafeAreaView, ImageBackground, Platform, StatusBar } from "react-native";
+import { FONTS, images } from "../constants";
 
 const Login = () => {
+
+    React.useEffect(() => {
+        if (Platform.OS === "android") {
+            StatusBar.setBackgroundColor('#FF573300');
+            StatusBar.setTranslucent(true)
+        }
+
+    }, []);
+
+    function renderContent() {
+        return (
+            <View
+                style={{
+                    flex: 1,
+                }}
+            >
+
+            </View>
+        )
+    }
+
     return (
-        <SafeAreaView style={styles.container}>
-            <Text style={{ ...FONTS.h1 }}>login</Text>
-        </SafeAreaView>
+        <View style={styles.container}>
+            <ImageBackground
+                source={images.background}
+                resizeMode="cover"
+                style={{
+                    height: '100%',
+                    width: '100%'
+                }}
+            >
+                {renderContent()}
+            </ImageBackground>
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#D88559',
         alignItems: 'center',
         justifyContent: 'center',
     },
