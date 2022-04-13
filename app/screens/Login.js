@@ -12,10 +12,18 @@ import {
 } from "react-native";
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { FontAwesome, Feather } from '@expo/vector-icons';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/firebase";
 
 const Login = ({ navigation }) => {
 
-    const [hide, setHide] = React.useState(true);
+    const [state, setState] = React.useState({
+        email: '',
+        password: '',
+        hide: true
+    });
+
+    const { email, password, hide } = state;
 
     React.useEffect(() => {
         if (Platform.OS === "android") {
@@ -24,6 +32,27 @@ const Login = ({ navigation }) => {
         }
 
     }, []);
+
+    const updateState = (newState) => {
+        setState({
+            ...state,
+            ...newState
+        })
+    }
+
+    const handleLogin = () => {
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+
+                const user = userCredential.user;
+                console.log("Login with : ", user.email);
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorMessage);
+            });
+    }
 
     function renderContent() {
         return (
@@ -58,10 +87,12 @@ const Login = ({ navigation }) => {
                     <TextInput
                         placeholder="Your Email ..."
                         placeholderTextColor={COLORS.black}
+                        value={email}
                         style={{
                             ...FONTS.h3_light,
                             color: COLORS.black
                         }}
+                        onChangeText={(email) => updateState({ email: email })}
                     />
                 </View>
                 {/* Password */}
@@ -88,16 +119,19 @@ const Login = ({ navigation }) => {
                     <TextInput
                         placeholder="Your Password ..."
                         placeholderTextColor={COLORS.black}
+                        value={password}
                         secureTextEntry={hide}
                         style={{
                             ...FONTS.h3_light,
                             color: COLORS.black,
                             flex: 1
                         }}
+
+                        onChangeText={(password) => updateState({ password: password })}
                     />
 
                     <TouchableOpacity
-                        onPress={() => setHide(!hide)}
+                        onPress={() => updateState({ hide: !hide })}
                     >
                         {
                             hide ?
@@ -119,7 +153,7 @@ const Login = ({ navigation }) => {
                         borderRadius: SIZES.radius
 
                     }}
-                    onPress={() => navigation.navigate('SignIn')}
+                    onPress={handleLogin}
                 >
                     <Text style={{ ...FONTS.h2, color: COLORS.white }}>Login</Text>
                 </TouchableOpacity>
