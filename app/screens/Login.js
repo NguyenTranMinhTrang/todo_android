@@ -8,12 +8,12 @@ import {
     Platform,
     StatusBar,
     TouchableOpacity,
-    KeyboardAvoidingView
 } from "react-native";
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { FontAwesome, Feather } from '@expo/vector-icons';
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase/firebase";
+import vadilator from "../utils/validation";
+import { showError, showSuccess } from "../components/showMessage";
+import { signInUser } from "../utils/services";
 
 const Login = ({ navigation }) => {
 
@@ -40,18 +40,33 @@ const Login = ({ navigation }) => {
         })
     }
 
-    const handleLogin = () => {
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
+    const validate = () => {
+        const error = vadilator({
+            email,
+            password
+        })
 
-                const user = userCredential.user;
-                console.log("Login with : ", user.email);
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorMessage);
-            });
+        if (error) {
+            showError(error);
+            return false;
+        }
+        return true;
+    }
+
+    const signInCallBack = (response) => {
+        console.log(response);
+        if (response.result === "success") {
+            showSuccess("Sign in successfully!");
+            navigation.navigate("Home");
+        }
+    }
+
+    const handleLogin = () => {
+        const isValid = validate();
+        if (isValid) {
+            signInUser(email, password, signInCallBack);
+        }
+
     }
 
     function renderContent() {

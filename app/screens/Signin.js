@@ -12,8 +12,9 @@ import {
 } from "react-native";
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { FontAwesome, Feather } from '@expo/vector-icons';
-import { auth } from "../firebase/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import vadilator from "../utils/validation";
+import { showError, showSuccess } from "../components/showMessage";
+import { signUpUser } from "../utils/services";
 
 const SignIn = ({ navigation }) => {
 
@@ -42,15 +43,34 @@ const SignIn = ({ navigation }) => {
         })
     }
 
+    const validate = () => {
+        const error = vadilator({
+            email,
+            password,
+            confirmPassword,
+        })
+
+        if (error) {
+            console.log(error);
+            showError(error);
+            return false;
+        }
+        return true;
+    }
+
+    const signUpCallback = (response) => {
+        if (response.result === "success") {
+            showSuccess("Sign up successfully!");
+            navigation.navigate("Login");
+        }
+    }
+
     const signIn = () => {
-        createUserWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                console.log(user.email);
-            })
-            .catch((error) => {
-                console.log(error);
-            })
+        console.log("hello");
+        const isValid = validate();
+        if (isValid) {
+            signUpUser(email, password, signUpCallback);
+        }
     }
 
     function renderContent() {
