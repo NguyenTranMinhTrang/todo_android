@@ -66,7 +66,6 @@ const SignIn = ({ navigation }) => {
     }
 
     const signIn = () => {
-        console.log("hello");
         const isValid = validate();
         if (isValid) {
             signUpUser(email, password, signUpCallback);

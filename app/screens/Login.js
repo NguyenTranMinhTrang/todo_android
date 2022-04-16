@@ -8,12 +8,14 @@ import {
     Platform,
     StatusBar,
     TouchableOpacity,
+    Alert
 } from "react-native";
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { FontAwesome, Feather } from '@expo/vector-icons';
 import vadilator from "../utils/validation";
 import { showError, showSuccess } from "../components/showMessage";
 import { signInUser } from "../utils/services";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = ({ navigation }) => {
 
@@ -30,6 +32,15 @@ const Login = ({ navigation }) => {
             StatusBar.setBackgroundColor('#FF573300');
             StatusBar.setTranslucent(true)
         }
+
+        const checkUserState = async () => {
+            let user = await AsyncStorage.getItem('user');
+            if (user) {
+                navigation.navigate("Home");
+            }
+        }
+
+        checkUserState();
 
     }, []);
 
@@ -53,11 +64,14 @@ const Login = ({ navigation }) => {
         return true;
     }
 
-    const signInCallBack = (response) => {
-        console.log(response);
+    const signInCallBack = async (response) => {
         if (response.result === "success") {
             showSuccess("Sign in successfully!");
+            await AsyncStorage.setItem('user', response.user);
             navigation.navigate("Home");
+        }
+        else {
+            Alert.alert("Error signing in", "Invalid email / password");
         }
     }
 
@@ -171,6 +185,20 @@ const Login = ({ navigation }) => {
                     onPress={handleLogin}
                 >
                     <Text style={{ ...FONTS.h2, color: COLORS.white }}>Login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={{
+                        marginTop: SIZES.base,
+                        backgroundColor: COLORS.black,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        paddingVertical: SIZES.base * 2,
+                        borderRadius: SIZES.radius
+
+                    }}
+                    onPress={() => navigation.navigate("SignIn")}
+                >
+                    <Text style={{ ...FONTS.h2, color: COLORS.white }}>Sign Up</Text>
                 </TouchableOpacity>
             </View >
         )
