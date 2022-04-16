@@ -2,38 +2,51 @@ import React from "react";
 import {
     View,
     Text,
-    SafeAreaView,
     StyleSheet,
     TouchableOpacity,
     TextInput,
-    FlatList
+    FlatList,
+    Keyboard
 } from "react-native";
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { Feather, Ionicons } from '@expo/vector-icons';
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-const Home = () => {
+const Home = ({ navigation }) => {
 
     const [color, setColor] = React.useState(COLORS.blue);
+    const [newTodo, setNewTodo] = React.useState('');
+    const [data, setData] = React.useState([]);
+
+    /* const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const uid = user.uid;
+            console.log(user);
+        } else {
+            console.log('No');
+        }
+    }); */
 
     // fake data
 
     const colors = [COLORS.bubble, COLORS.blue, COLORS.green, COLORS.orange, COLORS.pink];
 
-    const data = [
-        {
-            id: 1,
-            name: 'Do Exercise'
-        },
-        {
-            id: 2,
-            name: 'Go out'
-        },
-        {
-            id: 3,
-            name: 'Code'
+    const addNewTodo = () => {
+        if (newTodo !== '') {
+            const todo = {
+                id: data.length + 1,
+                name: newTodo
+            }
+
+            const oldList = [...data];
+            oldList.push(todo);
+            setData(oldList);
+            setNewTodo('');
+            Keyboard.dismiss();
         }
 
-    ]
+    }
 
     function renderHeader() {
         return (
@@ -53,7 +66,9 @@ const Home = () => {
                         justifyContent: 'center',
                     }}
                 >
-                    <TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => navigation.openDrawer()}
+                    >
                         <Feather name="menu" size={30} color="white" />
                     </TouchableOpacity>
                 </View>
@@ -156,6 +171,9 @@ const Home = () => {
                             backgroundColor: COLORS.white,
                             borderColor: '#C0C0C0'
                         }}
+
+                        value={newTodo}
+                        onChangeText={(todo) => setNewTodo(todo)}
                     />
                     <TouchableOpacity
                         style={{
@@ -167,6 +185,8 @@ const Home = () => {
                             justifyContent: 'center',
                             alignItems: 'center'
                         }}
+
+                        onPress={addNewTodo}
                     >
                         <Ionicons name="add-sharp" size={50} color="white" />
                     </TouchableOpacity>

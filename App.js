@@ -3,10 +3,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font';
 import FlashMessage from "react-native-flash-message";
+import 'react-native-gesture-handler';
 
 
 // screen
-import { Home, SignIn, Login } from './app/screens';
+import { SignIn, Login } from './app/screens';
+import MyDrawer from './app/navigation/Draw';
 
 const Stack = createNativeStackNavigator();
 
@@ -31,7 +33,7 @@ export default function App() {
         initialRouteName='Login'
       >
         <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="MyDrawer" component={MyDrawer} />
         <Stack.Screen name="SignIn" component={SignIn} />
       </Stack.Navigator>
       <FlashMessage position="top" />

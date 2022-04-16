@@ -36,7 +36,7 @@ const Login = ({ navigation }) => {
         const checkUserState = async () => {
             let user = await AsyncStorage.getItem('user');
             if (user) {
-                navigation.navigate("Home");
+                navigation.navigate("MyDrawer");
             }
         }
 
@@ -67,8 +67,9 @@ const Login = ({ navigation }) => {
     const signInCallBack = async (response) => {
         if (response.result === "success") {
             showSuccess("Sign in successfully!");
+            console.log(response.user);
             await AsyncStorage.setItem('user', response.user);
-            navigation.navigate("Home");
+            navigation.navigate("MyDrawer");
         }
         else {
             Alert.alert("Error signing in", "Invalid email / password");

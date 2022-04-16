@@ -18,7 +18,12 @@ const signInUser = (email, password, callback) => {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             const user = userCredential.user;
-            callback({ result: "success", user: user.email });
+            callback({
+                result: "success", user: {
+                    email: user.email,
+                    id: user.uid
+                }
+            });
         })
         .catch((error) => {
             console.log(error);
