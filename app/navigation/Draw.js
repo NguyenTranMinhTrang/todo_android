@@ -3,16 +3,39 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { Home } from '../screens';
 import {
     View,
+    Alert
 } from "react-native";
-
-import { Avatar, Title, Caption, Drawer } from 'react-native-paper';
+import { Avatar, Title, Drawer } from 'react-native-paper';
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { DrawerItem } from '@react-navigation/drawer';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { clearUserData, handleSignOut } from '../utils/services';
+import { showSuccess } from '../components/showMessage';
 
 const Draw = createDrawerNavigator();
 
-const MyDrawer = () => {
+const MyDrawer = ({ navigation }) => {
+
+    const onSignOut = () => {
+        Alert.alert(
+            'Sign Out',
+            'Are you sure, yout want to sign out from this device',
+            [{ text: 'Yes', onPress: signOut }, { text: 'No', }],
+            { cancelable: true }
+        )
+    }
+
+    const signOut = () => {
+        clearUserData();
+        handleSignOut()
+            .then(() => {
+                showSuccess("Sign Out Successfully!");
+                navigation.replace('Login');
+            })
+            .catch((error) => {
+                console.log(error);
+            })
+    }
 
     const drawerContent = () => {
         return (
@@ -44,7 +67,7 @@ const MyDrawer = () => {
                             ...FONTS.body3
 
                         }}
-                        onPress={() => { }}
+                        onPress={onSignOut}
                     />
                 </Drawer.Section>
             </View>
