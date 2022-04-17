@@ -14,7 +14,16 @@ import { showSuccess } from '../components/showMessage';
 
 const Draw = createDrawerNavigator();
 
-const MyDrawer = ({ navigation }) => {
+const MyDrawer = ({ navigation, route }) => {
+
+    const [user, setUser] = React.useState(null);
+
+    React.useEffect(() => {
+        let { user } = route.params;
+        if (user) {
+            setUser(user);
+        }
+    }, []);
 
     const onSignOut = () => {
         Alert.alert(
@@ -48,7 +57,7 @@ const MyDrawer = ({ navigation }) => {
                             size={100}
                         />
                         <View>
-                            <Title style={{ ...FONTS.body3, color: COLORS.blue }}>minhtrang@gmail.com</Title>
+                            <Title style={{ ...FONTS.body3, color: COLORS.blue }}>{user?.email}</Title>
                         </View>
                     </View>
                 </View>

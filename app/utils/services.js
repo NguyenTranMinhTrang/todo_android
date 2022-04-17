@@ -1,6 +1,7 @@
-import { auth } from "../firebase/firebase";
+import { auth, database } from "../firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ref, set } from "firebase/database";
 
 const signUpUser = (email, password, callback) => {
     createUserWithEmailAndPassword(auth, email, password)

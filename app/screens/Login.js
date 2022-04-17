@@ -15,7 +15,6 @@ import { FontAwesome, Feather } from '@expo/vector-icons';
 import vadilator from "../utils/validation";
 import { showError, showSuccess } from "../components/showMessage";
 import { signInUser, setUserData, getUserData } from "../utils/services";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Login = ({ navigation }) => {
 
@@ -37,7 +36,9 @@ const Login = ({ navigation }) => {
             let user = await getUserData();
             console.log(user);
             if (user) {
-                navigation.navigate("MyDrawer");
+                navigation.navigate("MyDrawer", {
+                    user
+                });
             }
         }
 
@@ -68,10 +69,10 @@ const Login = ({ navigation }) => {
     const signInCallBack = async (response) => {
         if (response.result === "success") {
             showSuccess("Sign in successfully!");
-            console.log(response.data);
             await setUserData(response.data).then(() => {
-                console.log("Save success");
-                navigation.navigate("MyDrawer");
+                navigation.navigate("MyDrawer", {
+                    user: response.data
+                });
             })
         }
         else {

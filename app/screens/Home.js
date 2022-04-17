@@ -11,26 +11,30 @@ import {
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getUserData } from "../utils/services";
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, route }) => {
 
     const [color, setColor] = React.useState(COLORS.blue);
     const [newTodo, setNewTodo] = React.useState('');
     const [data, setData] = React.useState([]);
-
-    /* const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            const uid = user.uid;
-            console.log(user);
-        } else {
-            console.log('No');
-        }
-    }); */
+    const [user, setUser] = React.useState(null);
 
     // fake data
 
     const colors = [COLORS.bubble, COLORS.blue, COLORS.green, COLORS.orange, COLORS.pink];
+
+    React.useEffect(() => {
+        const getUser = async () => {
+            const userData = await getUserData();
+            if (userData) {
+                setUser(userData);
+            }
+        }
+
+        getUser();
+    }, []);
+
 
     const addNewTodo = () => {
         if (newTodo !== '') {
@@ -108,7 +112,7 @@ const Home = ({ navigation }) => {
                         }}
                     >
                         <Text style={{ ...FONTS.body3, color: COLORS.white }}>Hello</Text>
-                        <Text style={{ ...FONTS.body3, color: COLORS.white }}>minhtrang@gmail.com</Text>
+                        <Text style={{ ...FONTS.body3, color: COLORS.white }}>{user?.email}</Text>
                     </View>
                 </View>
             </View>
