@@ -1,7 +1,9 @@
 import { auth, database } from "../firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ref, set } from "firebase/database";
+import { ref, set, push, onValue } from "firebase/database";
+
+
 
 const signUpUser = (email, password, callback) => {
     createUserWithEmailAndPassword(auth, email, password)
@@ -46,11 +48,51 @@ const setUserData = async (data) => {
     data = JSON.stringify(data);
     return AsyncStorage.setItem('user', data);
 }
+
+const addnewTask = (userId, data) => {
+    const postListRef = ref(database, 'todo/' + userId);
+    const newPostRef = push(postListRef);
+    set(newPostRef, {
+        name: data.name,
+        description: data.des,
+        complete: data.complete
+    })
+        .then(() => {
+            console.log('Success');
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+}
+
+const readTask = async (userId) => {
+    const db = ref(database, 'todo/' + userId);
+    const value = [];
+    onValue(db, (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+            const childKey = childSnapshot.key;
+            const childData = childSnapshot.val();
+            const data = {
+                id: childKey,
+                ...childData
+            }
+            value.push(data);
+
+        });
+    }, {
+        onlyOnce: false
+    });
+    console.log('value : ', value);
+    return value;
+}
+
 export {
     signUpUser,
     signInUser,
     clearUserData,
     handleSignOut,
     setUserData,
-    getUserData
+    getUserData,
+    addnewTask,
+    readTask
 }

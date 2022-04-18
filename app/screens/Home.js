@@ -10,10 +10,9 @@ import {
 } from "react-native";
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { getUserData } from "../utils/services";
+import { getUserData, addnewTask, readTask } from "../utils/services";
 
-const Home = ({ navigation, route }) => {
+const Home = ({ navigation }) => {
 
     const [color, setColor] = React.useState(COLORS.blue);
     const [newTodo, setNewTodo] = React.useState('');
@@ -30,22 +29,23 @@ const Home = ({ navigation, route }) => {
             if (userData) {
                 setUser(userData);
             }
+            const listData = await readTask(userData.id);
+            console.log(listData);
+            setData(listrData);
         }
-
         getUser();
+
     }, []);
 
 
     const addNewTodo = () => {
         if (newTodo !== '') {
             const todo = {
-                id: data.length + 1,
-                name: newTodo
+                name: newTodo,
+                des: '',
+                complete: false
             }
-
-            const oldList = [...data];
-            oldList.push(todo);
-            setData(oldList);
+            addnewTask(user.id, todo);
             setNewTodo('');
             Keyboard.dismiss();
         }
