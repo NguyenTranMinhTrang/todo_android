@@ -66,24 +66,24 @@ const addnewTask = (userId, data) => {
 }
 
 const readTask = async (userId) => {
-    const db = ref(database, 'todo/' + userId);
-    const value = [];
-    onValue(db, (snapshot) => {
-        snapshot.forEach((childSnapshot) => {
-            const childKey = childSnapshot.key;
-            const childData = childSnapshot.val();
-            const data = {
-                id: childKey,
-                ...childData
-            }
-            value.push(data);
-
+    return new Promise((resolve, reject) => {
+        let value = [];
+        const db = ref(database, 'todo/' + userId);
+        onValue(db, (snapshot) => {
+            snapshot.forEach((childSnapshot) => {
+                const childKey = childSnapshot.key;
+                const childData = childSnapshot.val();
+                const data = {
+                    id: childKey,
+                    ...childData
+                }
+                value.push(data);
+            });
+            resolve(value);
+        }, {
+            onlyOnce: false
         });
-    }, {
-        onlyOnce: false
-    });
-    console.log('value : ', value);
-    return value;
+    })
 }
 
 export {

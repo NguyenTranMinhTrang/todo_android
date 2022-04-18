@@ -11,6 +11,8 @@ import {
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { getUserData, addnewTask, readTask } from "../utils/services";
+import { auth, database } from "../firebase/firebase";
+import { ref, set, push, onValue } from "firebase/database";
 
 const Home = ({ navigation }) => {
 
@@ -18,6 +20,7 @@ const Home = ({ navigation }) => {
     const [newTodo, setNewTodo] = React.useState('');
     const [data, setData] = React.useState([]);
     const [user, setUser] = React.useState(null);
+    console.log('render');
 
     // fake data
 
@@ -29,9 +32,23 @@ const Home = ({ navigation }) => {
             if (userData) {
                 setUser(userData);
             }
-            const listData = await readTask(userData.id);
-            console.log(listData);
-            setData(listrData);
+            onValue(ref(database, 'todo/' + userData.id), (snapshot) => {
+                console.log('come here');
+                let value = data.splice();
+                snapshot.forEach((childSnapshot) => {
+                    const childKey = childSnapshot.key;
+                    const childData = childSnapshot.val();
+                    const data = {
+                        id: childKey,
+                        ...childData
+                    }
+                    value.push(data);
+                });
+                setData([...value]);
+                console.log(value);
+            }, {
+                onlyOnce: false
+            });
         }
         getUser();
 
@@ -152,7 +169,7 @@ const Home = ({ navigation }) => {
         return (
             <View
                 style={{
-                    padding: SIZES.padding
+                    padding: SIZES.padding,
                 }}
             >
                 <Text style={{ ...FONTS.h2 }}>List Task</Text>
@@ -228,7 +245,7 @@ const Home = ({ navigation }) => {
                     showsVerticalScrollIndicator={false}
                     keyExtractor={item => `${item.id}`}
                     renderItem={renderItem}
-                    contentContainerStyle={{ paddingVertical: SIZES.padding }}
+                    contentContainerStyle={{ paddingTop: SIZES.padding }}
                 />
             </View>
         )
