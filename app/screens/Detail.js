@@ -3,11 +3,13 @@ import {
     View,
     Text,
     SafeAreaView,
-    StyleSheet,
     TouchableOpacity,
     TextInput,
-    FlatList,
-    Keyboard
+    Modal,
+    Pressable,
+    LogBox,
+    StatusBar,
+    Platform
 } from "react-native";
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { AntDesign, Fontisto, MaterialIcons } from '@expo/vector-icons';
@@ -28,6 +30,11 @@ const Detail = ({ navigation, route }) => {
     console.log(data);
 
     React.useEffect(() => {
+        if (Platform.OS === 'android') {
+            StatusBar.setBackgroundColor('#FF573300');
+            StatusBar.setTranslucent(true);
+        }
+        LogBox.ignoreLogs(['Setting a timer for a long period of time']);
         let item = route.params.item;
         setTask(item);
     }, [])
@@ -47,7 +54,6 @@ const Detail = ({ navigation, route }) => {
 
 
     const onChange = (event, selectedDate) => {
-        console.log(event);
         const currentDate = selectedDate || date;
         setDate(currentDate);
         let tempDate = new Date(currentDate);
@@ -61,7 +67,7 @@ const Detail = ({ navigation, route }) => {
 
     function renderHeader() {
         return (
-            <View style={{ flexDirection: 'row', marginTop: SIZES.base }}>
+            <View style={{ flexDirection: 'row', marginTop: SIZES.padding, justifyContent: 'center' }}>
                 <TouchableOpacity
                     style={{
                         height: 50,
@@ -85,7 +91,8 @@ const Detail = ({ navigation, route }) => {
                 <View
                     style={{
                         flex: 1,
-                        marginLeft: SIZES.padding
+                        marginLeft: SIZES.padding,
+                        justifyContent: 'center'
                     }}
                 >
                     <Text style={{ ...FONTS.h1 }}>{task?.name}</Text>
@@ -108,6 +115,7 @@ const Detail = ({ navigation, route }) => {
                             borderRadius: SIZES.radius,
                             padding: SIZES.base * 2,
                         }}
+                        onChangeText={(des) => updateState({ des: des })}
                     />
                 </View>
 
@@ -135,25 +143,7 @@ const Detail = ({ navigation, route }) => {
                         <Fontisto name="date" size={30} color="black" />
                     </TouchableOpacity>
 
-                    {
-                        show && mode == 'date' && (
-                            <DateTimePicker
-                                testID="dateTimePicker"
-                                value={date}
-                                mode={mode}
-                                is24Hour={true}
-                                display='default'
-                                onChange={onChange}
-                                style={{
-                                    position: 'absolute',
-                                    left: SIZES.width * 0.7,
-                                    width: 100,
-                                    height: 100
-                                }}
 
-                            />
-                        )
-                    }
                 </View>
 
                 <View
@@ -179,25 +169,34 @@ const Detail = ({ navigation, route }) => {
                     >
                         <MaterialIcons name="av-timer" size={40} color="black" />
                     </TouchableOpacity>
-
-                    {
-                        show && mode == 'time' && (
-                            <DateTimePicker
-                                testID="dateTimePicker"
-                                value={date}
-                                mode={mode}
-                                is24Hour={true}
-                                display='default'
-                                onChange={onChange}
-                                style={{
-                                    height: 200,
-                                    width: 200
-                                }}
-
-                            />
-                        )
-                    }
                 </View>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={show}
+                    onRequestClose={() => setShow(false)}
+                >
+                    <Pressable
+                        style={{
+                            flex: 1,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            paddingHorizontal: SIZES.padding
+                        }}
+                        onPress={() => setShow(false)}
+                    >
+                        <DateTimePicker
+                            testID="dateTimePicker"
+                            value={date}
+                            mode={mode}
+                            display={Platform.OS === "ios" ? "spinner" : "default"}
+                            is24Hour={true}
+                            onChange={onChange}
+                            themeVariant="light"
+                            style={{ width: '100%', backgroundColor: 'white', height: 500 }}
+                        />
+                    </Pressable>
+                </Modal>
             </View>
         )
     }
