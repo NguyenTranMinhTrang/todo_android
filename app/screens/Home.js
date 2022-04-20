@@ -20,10 +20,8 @@ const Home = ({ navigation }) => {
     const [newTodo, setNewTodo] = React.useState('');
     const [data, setData] = React.useState([]);
     const [user, setUser] = React.useState(null);
-    console.log('render');
 
     // fake data
-
     const colors = [COLORS.bubble, COLORS.blue, COLORS.green, COLORS.orange, COLORS.pink];
 
     React.useEffect(() => {
@@ -33,7 +31,6 @@ const Home = ({ navigation }) => {
                 setUser(userData);
             }
             onValue(ref(database, 'todo/' + userData.id), (snapshot) => {
-                console.log('come here');
                 let value = data.splice();
                 snapshot.forEach((childSnapshot) => {
                     const childKey = childSnapshot.key;
@@ -45,7 +42,6 @@ const Home = ({ navigation }) => {
                     value.push(data);
                 });
                 setData([...value]);
-                console.log(value);
             }, {
                 onlyOnce: false
             });
@@ -68,6 +64,14 @@ const Home = ({ navigation }) => {
         }
 
     }
+
+    const onSelectItem = (item) => {
+        navigation.navigate("Detail", {
+            item
+        });
+    }
+
+    //render
 
     function renderHeader() {
         return (
@@ -138,7 +142,7 @@ const Home = ({ navigation }) => {
 
     function renderItem({ item }) {
         return (
-            <View
+            <TouchableOpacity
                 style={{
                     flexDirection: "row",
                     backgroundColor: color,
@@ -147,6 +151,8 @@ const Home = ({ navigation }) => {
                     borderRadius: SIZES.radius,
                     alignItems: 'center'
                 }}
+
+                onPress={() => onSelectItem(item)}
             >
                 <Text style={{ ...FONTS.body3, flex: 1, color: COLORS.white }}>{item.name}</Text>
                 <View
@@ -161,7 +167,7 @@ const Home = ({ navigation }) => {
                 >
 
                 </View>
-            </View>
+            </TouchableOpacity>
         )
     }
 

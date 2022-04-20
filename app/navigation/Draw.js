@@ -1,6 +1,6 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { Home } from '../screens';
+import { Home, Detail } from '../screens';
 import {
     View,
     Alert
@@ -93,6 +93,7 @@ const MyDrawer = ({ navigation, route }) => {
             drawerContent={drawerContent}
         >
             <Draw.Screen name="Home" component={Home} />
+            <Draw.Screen name="Detail" component={Detail} />
         </Draw.Navigator>
 
     );
