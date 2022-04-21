@@ -6,13 +6,15 @@ import {
     TouchableOpacity,
     TextInput,
     FlatList,
-    Keyboard
+    Keyboard,
+    Animated
 } from "react-native";
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getUserData, addnewTask, readTask } from "../utils/services";
+import { getUserData, addnewTask, deleteTodo } from "../utils/services";
 import { auth, database } from "../firebase/firebase";
 import { ref, set, push, onValue } from "firebase/database";
+import { Swipeable } from "react-native-gesture-handler";
 
 const Home = ({ navigation }) => {
 
@@ -56,7 +58,8 @@ const Home = ({ navigation }) => {
             const todo = {
                 name: newTodo,
                 des: '',
-                complete: false
+                time: '',
+                date: ''
             }
             addnewTask(user.id, todo);
             setNewTodo('');
@@ -67,8 +70,43 @@ const Home = ({ navigation }) => {
 
     const onSelectItem = (item) => {
         navigation.navigate("Detail", {
-            item
+            userId: user.id,
+            item: item
         });
+    }
+
+    const rightAction = (dragX, item) => {
+        const scale = dragX.interpolate({
+            inputRange: [-100, 0],
+            outputRange: [1, 0.9],
+            extrapolate: "clamp"
+        });
+
+        const opacity = dragX.interpolate({
+            inputRange: [-100, -20, 0],
+            outputRange: [1, 0.9, 0],
+            extrapolate: "clamp"
+        })
+        return (
+            <TouchableOpacity
+                onPress={() => deleteTodo(user.id, item)}
+            >
+                <Animated.View
+                    style={[{
+                        backgroundColor: COLORS.red,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: 80,
+                        height: 63,
+                        borderRadius: SIZES.radius
+                    }, { opacity: opacity }]}
+                >
+                    <Animated.Text style={{ ...FONTS.h3, color: COLORS.white, transform: [{ scale }] }}>
+                        Delete
+                    </Animated.Text>
+                </Animated.View>
+            </TouchableOpacity>
+        )
     }
 
     //render
@@ -142,32 +180,34 @@ const Home = ({ navigation }) => {
 
     function renderItem({ item }) {
         return (
-            <TouchableOpacity
-                style={{
-                    flexDirection: "row",
-                    backgroundColor: color,
-                    marginBottom: SIZES.base * 2,
-                    padding: SIZES.base * 2,
-                    borderRadius: SIZES.radius,
-                    alignItems: 'center'
-                }}
-
-                onPress={() => onSelectItem(item)}
-            >
-                <Text style={{ ...FONTS.body3, flex: 1, color: COLORS.white }}>{item.name}</Text>
-                <View
+            <Swipeable renderRightActions={(_, dragX) => rightAction(dragX, item)}>
+                <TouchableOpacity
                     style={{
-                        height: 18,
-                        width: 18,
-                        borderWidth: 2,
-                        borderColor: COLORS.blue,
-                        backgroundColor: COLORS.white,
-                        borderRadius: 18
+                        flexDirection: "row",
+                        backgroundColor: color,
+                        marginBottom: SIZES.base * 2,
+                        padding: SIZES.base * 2,
+                        borderRadius: SIZES.radius,
+                        alignItems: 'center'
                     }}
-                >
 
-                </View>
-            </TouchableOpacity>
+                    onPress={() => onSelectItem(item)}
+                >
+                    <Text style={{ ...FONTS.body3, flex: 1, color: COLORS.white }}>{item.name}</Text>
+                    <View
+                        style={{
+                            height: 18,
+                            width: 18,
+                            borderWidth: 2,
+                            borderColor: COLORS.blue,
+                            backgroundColor: COLORS.white,
+                            borderRadius: 18
+                        }}
+                    >
+
+                    </View>
+                </TouchableOpacity>
+            </Swipeable>
         )
     }
 

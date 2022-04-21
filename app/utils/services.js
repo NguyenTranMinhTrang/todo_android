@@ -1,7 +1,7 @@
 import { auth, database } from "../firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ref, set, push, onValue } from "firebase/database";
+import { ref, set, push, onValue, remove, } from "firebase/database";
 
 
 
@@ -55,7 +55,8 @@ const addnewTask = (userId, data) => {
     set(newPostRef, {
         name: data.name,
         description: data.des,
-        complete: data.complete
+        date: data.date,
+        time: data.time
     })
         .then(() => {
             console.log('Success');
@@ -65,25 +66,31 @@ const addnewTask = (userId, data) => {
         });
 }
 
-const readTask = async (userId) => {
-    return new Promise((resolve, reject) => {
-        let value = [];
-        const db = ref(database, 'todo/' + userId);
-        onValue(db, (snapshot) => {
-            snapshot.forEach((childSnapshot) => {
-                const childKey = childSnapshot.key;
-                const childData = childSnapshot.val();
-                const data = {
-                    id: childKey,
-                    ...childData
-                }
-                value.push(data);
-            });
-            resolve(value);
-        }, {
-            onlyOnce: false
-        });
+const deleteTodo = (userId, item) => {
+    const pathDelete = ref(database, 'todo/' + userId + "/" + item.id);
+    remove(pathDelete)
+        .then(() => {
+            console.log('delete success');
+        })
+        .catch((error) => {
+            console.log(error);
+        })
+}
+
+const updateTodo = (userId, data) => {
+    const postListRef = ref(database, 'todo/' + userId + "/" + data.id);
+    set(postListRef, {
+        name: data.name,
+        description: data.des,
+        date: data.date,
+        time: data.time
     })
+        .then(() => {
+            console.log('Update success');
+        })
+        .catch((error) => {
+            console.log(error);
+        });
 }
 
 export {
@@ -94,5 +101,6 @@ export {
     setUserData,
     getUserData,
     addnewTask,
-    readTask
+    deleteTodo,
+    updateTodo
 }

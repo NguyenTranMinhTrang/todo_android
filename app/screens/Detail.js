@@ -14,6 +14,8 @@ import {
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { AntDesign, Fontisto, MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { updateTodo } from "../utils/services";
+import { update } from "firebase/database";
 
 const Detail = ({ navigation, route }) => {
 
@@ -27,16 +29,18 @@ const Detail = ({ navigation, route }) => {
     const [show, setShow] = React.useState(false);
     const [mode, setMode] = React.useState('date');
 
-    console.log(data);
-
+    console.log(task);
     React.useEffect(() => {
         if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor('#FF573300');
             StatusBar.setTranslucent(true);
         }
         LogBox.ignoreLogs(['Setting a timer for a long period of time']);
-        let item = route.params.item;
-        setTask(item);
+        let { userId, item } = route.params;
+        setTask({
+            userId: userId,
+            ...item
+        });
     }, [])
 
 
@@ -60,6 +64,17 @@ const Detail = ({ navigation, route }) => {
         let sdate = tempDate.getDate() + "/" + (tempDate.getMonth() + 1) + "/" + tempDate.getFullYear();
         let stime = tempDate.getHours() + ":" + tempDate.getMinutes();
         updateState({ date: sdate, time: stime });
+    }
+
+    const update = () => {
+        const todo = {
+            id: task.id,
+            name: task.name,
+            des: data.des,
+            date: data.date,
+            time: data.time
+        }
+        updateTodo(task.userId, todo);
     }
 
 
@@ -197,6 +212,21 @@ const Detail = ({ navigation, route }) => {
                         />
                     </Pressable>
                 </Modal>
+                <TouchableOpacity
+                    style={{
+                        height: 60,
+                        width: 100,
+                        backgroundColor: COLORS.black,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginTop: SIZES.padding,
+                        borderRadius: SIZES.radius
+                    }}
+
+                    onPress={() => update()}
+                >
+                    <Text style={{ ...FONTS.h3, color: COLORS.white }}>Save</Text>
+                </TouchableOpacity>
             </View>
         )
     }
