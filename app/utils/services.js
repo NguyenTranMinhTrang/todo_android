@@ -1,7 +1,7 @@
 import { auth, database } from "../firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ref, set, push, onValue, remove, update } from "firebase/database";
+import { ref, set, push, remove, update } from "firebase/database";
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 
@@ -11,9 +11,14 @@ import * as Notifications from 'expo-notifications';
 const signUpUser = (email, password, callback) => {
     createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            const user = userCredential.user;
-            // createUser(user);
-            callback({ result: "success", user: user.email });
+            let user = JSON.parse(JSON.stringify(userCredential.user));
+            const userInfo = {
+                email: user.email,
+                uid: user.uid,
+                createdAt: user.createdAt
+            };
+            createUser(userInfo);
+            callback({ result: "success", user: userInfo.email });
         })
         .catch((error) => {
             console.log("error");
@@ -26,10 +31,11 @@ const signInUser = (email, password, callback) => {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             const user = userCredential.user;
-            //registerForPushNotificationsAsync(user);
+            registerForPushNotificationsAsync(user);
             callback({ result: "success", data: { email: user.email, id: user.uid } });
         })
         .catch((error) => {
+            callback({ result: "fail" })
             console.log(error);
         });
 }
@@ -56,7 +62,6 @@ const setUserData = async (data) => {
 }
 
 const createUser = (user) => {
-    console.log('come here');
     set(ref(database, 'users/' + user.uid), {
         email: user.email,
         createdAt: user.createdAt
@@ -144,7 +149,6 @@ const registerForPushNotificationsAsync = async (user) => {
     const updateData = {
         expoToken: token
     };
-
     update(ref(database, 'users/' + user.uid), {
         ...updateData
     })

@@ -76,7 +76,7 @@ const Login = ({ navigation }) => {
             })
         }
         else {
-            Alert.alert("Error signing in", "Invalid email / password");
+            showError("Invalid email / password");
         }
     }
 
