@@ -29,8 +29,8 @@ const Detail = ({ navigation, route }) => {
     const [show, setShow] = React.useState(false);
     const [mode, setMode] = React.useState('date');
 
-    console.log(task);
     React.useEffect(() => {
+        console.log('come here');
         if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor('#FF573300');
             StatusBar.setTranslucent(true);
@@ -41,7 +41,7 @@ const Detail = ({ navigation, route }) => {
             userId: userId,
             ...item
         });
-    }, [])
+    }, [route.params.item])
 
 
     const updateState = (newState) => {

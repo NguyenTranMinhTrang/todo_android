@@ -69,6 +69,7 @@ const Home = ({ navigation }) => {
     }
 
     const onSelectItem = (item) => {
+        console.log(item);
         navigation.navigate("Detail", {
             userId: user.id,
             item: item

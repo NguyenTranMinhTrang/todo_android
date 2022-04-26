@@ -11,17 +11,10 @@ import * as Notifications from 'expo-notifications';
 const signUpUser = (email, password, callback) => {
     createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            let user = JSON.parse(JSON.stringify(userCredential.user));
-            const userInfo = {
-                email: user.email,
-                uid: user.uid,
-                createdAt: user.createdAt
-            };
-            createUser(userInfo);
-            callback({ result: "success", user: userInfo.email });
+            let user = userCredential.user;
+            callback({ result: "success", user: user.email });
         })
         .catch((error) => {
-            console.log("error");
             callback({ result: "fail", error: error });
             console.log(error);
         })
@@ -31,8 +24,15 @@ const signInUser = (email, password, callback) => {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             const user = userCredential.user;
-            registerForPushNotificationsAsync(user);
-            callback({ result: "success", data: { email: user.email, id: user.uid } });
+            const token = await registerForPushNotificationsAsync();
+            callback({
+                result: "success", data: {
+                    email: user.email,
+                    id: user.uid,
+                    token: token,
+                    notification: []
+                }
+            });
         })
         .catch((error) => {
             callback({ result: "fail" })
@@ -61,18 +61,6 @@ const setUserData = async (data) => {
     return AsyncStorage.setItem('user', data);
 }
 
-const createUser = (user) => {
-    set(ref(database, 'users/' + user.uid), {
-        email: user.email,
-        createdAt: user.createdAt
-    })
-        .then(() => {
-            console.log('Success');
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-}
 
 const addnewTask = (userId, data) => {
     const postListRef = ref(database, 'todo/' + userId);
@@ -118,7 +106,7 @@ const updateTodo = (userId, data) => {
         });
 }
 
-const registerForPushNotificationsAsync = async (user) => {
+const registerForPushNotificationsAsync = async () => {
     let token;
     if (Device.isDevice) {
         const { status: existingStatus } = await Notifications.getPermissionsAsync();
@@ -146,18 +134,11 @@ const registerForPushNotificationsAsync = async (user) => {
         });
     }
 
-    const updateData = {
-        expoToken: token
-    };
-    update(ref(database, 'users/' + user.uid), {
-        ...updateData
-    })
-        .then(() => {
-            console.log("Save token success");
-        })
-        .catch((error) => {
-            console.log(error);
-        })
+    return token;
+}
+
+const schedulePushNotification = async (date, time) => {
+
 }
 
 export {
@@ -170,5 +151,4 @@ export {
     addnewTask,
     deleteTodo,
     updateTodo,
-    createUser
 }
