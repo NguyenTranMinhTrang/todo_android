@@ -25,7 +25,6 @@ const Home = ({ navigation }) => {
 
     // fake data
     const colors = [COLORS.bubble, COLORS.blue, COLORS.green, COLORS.orange, COLORS.pink];
-
     React.useEffect(() => {
         const getUser = async () => {
             const userData = await getUserData();
@@ -72,6 +71,8 @@ const Home = ({ navigation }) => {
         console.log(item);
         navigation.navigate("Detail", {
             userId: user.id,
+            token: user.token,
+            notifications: user.notifications,
             item: item
         });
     }

@@ -24,15 +24,16 @@ const signInUser = (email, password, callback) => {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             const user = userCredential.user;
-            const token = await registerForPushNotificationsAsync();
-            callback({
-                result: "success", data: {
-                    email: user.email,
-                    id: user.uid,
-                    token: token,
-                    notification: []
-                }
-            });
+            registerForPushNotificationsAsync().then(token => {
+                callback({
+                    result: "success", data: {
+                        email: user.email,
+                        id: user.uid,
+                        token: token,
+                        notifications: []
+                    }
+                });
+            })
         })
         .catch((error) => {
             callback({ result: "fail" })
@@ -120,7 +121,7 @@ const registerForPushNotificationsAsync = async () => {
             return;
         }
         token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log(token);
+        console.log("Token from server: ", token);
     } else {
         alert('Must use physical device for Push Notifications');
     }
@@ -137,8 +138,40 @@ const registerForPushNotificationsAsync = async () => {
     return token;
 }
 
-const schedulePushNotification = async (date, time) => {
+const schedulePushNotification = async (date, time, nameTask) => {
+    let arrayDate = date.split("/");
+    let arrayTime = time.split(":");
+    let now = Date.now();
+    let deadline = new Date(parseInt(arrayDate[2]), parseInt(arrayDate[1]) - 1, parseInt(arrayDate[0]), parseInt(arrayTime[0]), parseInt(arrayTime[1]), 0, 0);
+    let miliseconds = deadline.getTime();
+    let remind = miliseconds - now;
+    if (remind >= 0) {
+        let hours = remind / 3600000;
+        let absoluteHours = Math.floor(hours);
+        let minutes = (hours - absoluteHours) * 60;
+        let absoluteMinutes = Math.floor(minutes);
+        console.log(absoluteHours);
+        console.log(absoluteMinutes);
+        const id = await Notifications.scheduleNotificationAsync({
+            content: {
+                title: "Deadline!",
+                body: nameTask
+            },
+            trigger: {
+                hour: absoluteHours,
+                minute: absoluteMinutes,
+                repeats: true
+            }
+        })
+        console.log("notif id on scheduling", id)
+        return id;
+    }
 
+    return null;
+}
+
+const cancelNotification = async (notifId) => {
+    await Notifications.cancelScheduledNotificationAsync(notifId);
 }
 
 export {
@@ -151,4 +184,6 @@ export {
     addnewTask,
     deleteTodo,
     updateTodo,
+    schedulePushNotification,
+    cancelNotification
 }

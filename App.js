@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Alert } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -32,8 +32,9 @@ export default function App() {
   const notificationListener = useRef();
   const responseListener = useRef();
 
-  React.useEffect(() => {
+  useEffect(() => {
     notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
+      console.log(notification);
       Alert.alert(notification.request.content.title, notification.request.content.body);
     });
 

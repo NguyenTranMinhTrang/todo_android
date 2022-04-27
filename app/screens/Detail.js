@@ -14,8 +14,7 @@ import {
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { AntDesign, Fontisto, MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { updateTodo } from "../utils/services";
-import { update } from "firebase/database";
+import { updateTodo, schedulePushNotification, cancelNotification } from "../utils/services";
 
 const Detail = ({ navigation, route }) => {
 
@@ -24,23 +23,29 @@ const Detail = ({ navigation, route }) => {
     const [data, setData] = React.useState({
         des: '',
         time: '',
-        date: ''
+        date: date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear()
     })
     const [show, setShow] = React.useState(false);
     const [mode, setMode] = React.useState('date');
+    const [token, setToken] = React.useState('');
+    const [notification, setNotification] = React.useState([]);
+
+    console.log("token: ", token);
+    console.log("notification: ", notification);
 
     React.useEffect(() => {
-        console.log('come here');
         if (Platform.OS === 'android') {
             StatusBar.setBackgroundColor('#FF573300');
             StatusBar.setTranslucent(true);
         }
         LogBox.ignoreLogs(['Setting a timer for a long period of time']);
-        let { userId, item } = route.params;
+        let { userId, item, token, notifications } = route.params;
         setTask({
             userId: userId,
             ...item
         });
+        setToken(token);
+        setNotification(notifications);
     }, [route.params.item])
 
 
@@ -75,6 +80,17 @@ const Detail = ({ navigation, route }) => {
             time: data.time
         }
         updateTodo(task.userId, todo);
+        schedulePushNotification(data.date, data.time, task.name)
+            .then(id => {
+                if (id) {
+                    const array = [...notification];
+                    array.push({
+                        idTodo: task.id,
+                        idNoti: id
+                    })
+                    setNotification(array);
+                }
+            })
     }
 
 
