@@ -146,25 +146,21 @@ const schedulePushNotification = async (date, time, nameTask) => {
     let miliseconds = deadline.getTime();
     let remind = miliseconds - now;
     if (remind >= 0) {
-        let hours = remind / 3600000;
-        let absoluteHours = Math.floor(hours);
-        let minutes = (hours - absoluteHours) * 60;
-        let absoluteMinutes = Math.floor(minutes);
-        console.log(absoluteHours);
-        console.log(absoluteMinutes);
+        let seconds = Math.floor(remind / 1000);
         const id = await Notifications.scheduleNotificationAsync({
             content: {
                 title: "Deadline!",
                 body: nameTask
             },
             trigger: {
-                hour: absoluteHours,
-                minute: absoluteMinutes,
-                repeats: true
+                seconds: seconds
             }
         })
-        console.log("notif id on scheduling", id)
-        return id;
+        const result = {
+            id: id,
+            deadline: miliseconds
+        }
+        return result;
     }
 
     return null;

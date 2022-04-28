@@ -9,7 +9,8 @@ import {
     Pressable,
     LogBox,
     StatusBar,
-    Platform
+    Platform,
+    Alert
 } from "react-native";
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { AntDesign, Fontisto, MaterialIcons } from '@expo/vector-icons';
@@ -30,7 +31,7 @@ const Detail = ({ navigation, route }) => {
     const [token, setToken] = React.useState('');
     const [notification, setNotification] = React.useState([]);
 
-    console.log("token: ", token);
+    console.log("todo: ", data);
     console.log("notification: ", notification);
 
     React.useEffect(() => {
@@ -39,13 +40,12 @@ const Detail = ({ navigation, route }) => {
             StatusBar.setTranslucent(true);
         }
         LogBox.ignoreLogs(['Setting a timer for a long period of time']);
-        let { userId, item, token, notifications } = route.params;
+        let { userId, item, token } = route.params;
         setTask({
             userId: userId,
             ...item
         });
         setToken(token);
-        setNotification(notifications);
     }, [route.params.item])
 
 
@@ -81,14 +81,60 @@ const Detail = ({ navigation, route }) => {
         }
         updateTodo(task.userId, todo);
         schedulePushNotification(data.date, data.time, task.name)
-            .then(id => {
-                if (id) {
+            .then(result => {
+                if (result) {
+                    let notice = notification.filter((data) => {
+                        return data.idTodo == task.id;
+                    });
                     const array = [...notification];
-                    array.push({
-                        idTodo: task.id,
-                        idNoti: id
-                    })
-                    setNotification(array);
+
+                    console.log("notice: ", notice);
+
+                    if (!notice[0] || notification.length == 0) {
+                        console.log("create a new noti");
+                        const newNoti = {
+                            idTodo: task.id,
+                            idNoti: result.id,
+                            time: result.deadline
+                        }
+                        console.log("New notice: ", newNoti);
+                        array.push(newNoti);
+                        setNotification(array);
+                    }
+                    else {
+                        if (result.deadline < notice[0].time) {
+                            cancelNotification(notice[0].idNoti)
+                                .then(() => {
+                                    // set a new notification
+                                    console.log("cancle");
+                                    const newNoti = {
+                                        idTodo: notice[0].idTodo,
+                                        idNoti: result.id,
+                                        time: result.deadline
+                                    }
+                                    let index = array.indexOf(notice[0]);
+                                    console.log("index search: ", index);
+                                    array.splice(index, 1, newNoti);
+                                    setNotification(array);
+                                })
+                        }
+                        else {
+                            console.log("update a new notification");
+                            const newNoti = {
+                                idTodo: notice[0].idTodo,
+                                idNoti: result.id,
+                                time: result.deadline
+                            }
+                            let index = array.indexOf(notice[0]);
+                            console.log("index search: ", index);
+                            array.splice(index, 1, newNoti);
+                            setNotification(array);
+                        }
+
+                    }
+                }
+                else {
+                    Alert.alert("Error", "Set time error");
                 }
             })
     }
