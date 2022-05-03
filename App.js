@@ -34,7 +34,6 @@ export default function App() {
 
   useEffect(() => {
     notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
-      console.log(notification);
       Alert.alert(notification.request.content.title, notification.request.content.body);
     });
 

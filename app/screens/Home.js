@@ -13,7 +13,7 @@ import { FONTS, images, SIZES, COLORS } from "../constants";
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { getUserData, addnewTask, deleteTodo } from "../utils/services";
 import { auth, database } from "../firebase/firebase";
-import { ref, set, push, onValue } from "firebase/database";
+import { ref, set, push, onValue, update } from "firebase/database";
 import { Swipeable } from "react-native-gesture-handler";
 
 const Home = ({ navigation }) => {
@@ -22,6 +22,8 @@ const Home = ({ navigation }) => {
     const [newTodo, setNewTodo] = React.useState('');
     const [data, setData] = React.useState([]);
     const [user, setUser] = React.useState(null);
+    const notification = React.useRef([]);
+    const userId = React.useRef('');
 
     // fake data
     const colors = [COLORS.bubble, COLORS.blue, COLORS.green, COLORS.orange, COLORS.pink];
@@ -30,6 +32,8 @@ const Home = ({ navigation }) => {
             const userData = await getUserData();
             if (userData) {
                 setUser(userData);
+                notification.current = [...userData.notifications];
+                userId.current = userData.id;
             }
             onValue(ref(database, 'todo/' + userData.id), (snapshot) => {
                 let value = data.splice();
@@ -49,8 +53,26 @@ const Home = ({ navigation }) => {
         }
         getUser();
 
+        return () => {
+            console.log(userId.current);
+            update(ref(database, 'todo/' + userId.current), {
+                notifications: notification.current
+            })
+                .then(() => {
+                    console.log("update notification success");
+                })
+                .catch((error) => {
+                    console.log(error);
+                })
+        }
     }, []);
 
+
+
+    const updateNotification = (newNotification) => {
+        notification.current = [...newNotification];
+        console.log("notification.current from Home screen: ", notification.current);
+    }
 
     const addNewTodo = () => {
         if (newTodo !== '') {
@@ -68,12 +90,13 @@ const Home = ({ navigation }) => {
     }
 
     const onSelectItem = (item) => {
-        console.log(item);
         navigation.navigate("Detail", {
+            email: user.email,
             userId: user.id,
             token: user.token,
-            notifications: user.notifications,
-            item: item
+            notification: notification.current,
+            item: item,
+            updateNotification: updateNotification
         });
     }
 

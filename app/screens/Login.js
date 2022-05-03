@@ -66,6 +66,7 @@ const Login = ({ navigation }) => {
         return true;
     }
 
+
     const signInCallBack = async (response) => {
         if (response.result === "success") {
             showSuccess("Sign in successfully!");

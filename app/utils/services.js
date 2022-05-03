@@ -1,7 +1,7 @@
 import { auth, database } from "../firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ref, set, push, remove, update } from "firebase/database";
+import { ref, set, push, remove, update, get, child } from "firebase/database";
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 
@@ -22,15 +22,28 @@ const signUpUser = (email, password, callback) => {
 
 const signInUser = (email, password, callback) => {
     signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        .then(async (userCredential) => {
             const user = userCredential.user;
+            let notifications = await get(child(ref(database), 'todo/' + user.uid))
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        if (snapshot.val().notifications) {
+                            return (snapshot.val().notifications);
+                        }
+                    } else {
+                        console.log("No data available");
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                });
+            console.log("Notification from db: ", notifications);
             registerForPushNotificationsAsync().then(token => {
                 callback({
                     result: "success", data: {
                         email: user.email,
                         id: user.uid,
                         token: token,
-                        notifications: []
+                        notifications: notifications
                     }
                 });
             })

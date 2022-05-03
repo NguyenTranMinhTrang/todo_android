@@ -15,7 +15,7 @@ import {
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { AntDesign, Fontisto, MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { updateTodo, schedulePushNotification, cancelNotification } from "../utils/services";
+import { updateTodo, schedulePushNotification, cancelNotification, setUserData, getUserData } from "../utils/services";
 
 const Detail = ({ navigation, route }) => {
 
@@ -28,11 +28,7 @@ const Detail = ({ navigation, route }) => {
     })
     const [show, setShow] = React.useState(false);
     const [mode, setMode] = React.useState('date');
-    const [token, setToken] = React.useState('');
     const [notification, setNotification] = React.useState([]);
-
-    console.log("todo: ", data);
-    console.log("notification: ", notification);
 
     React.useEffect(() => {
         if (Platform.OS === 'android') {
@@ -40,12 +36,15 @@ const Detail = ({ navigation, route }) => {
             StatusBar.setTranslucent(true);
         }
         LogBox.ignoreLogs(['Setting a timer for a long period of time']);
-        let { userId, item, token } = route.params;
+        console.log("Route params :", route.params);
+        let { userId, item, email, token, notification } = route.params;
         setTask({
             userId: userId,
+            email: email,
+            token: token,
             ...item
         });
-        setToken(token);
+        setNotification(notification);
     }, [route.params.item])
 
 
@@ -100,6 +99,7 @@ const Detail = ({ navigation, route }) => {
                         console.log("New notice: ", newNoti);
                         array.push(newNoti);
                         setNotification(array);
+                        route.params.updateNotification(array);
                     }
                     else {
                         if (result.deadline < notice[0].time) {
@@ -116,6 +116,7 @@ const Detail = ({ navigation, route }) => {
                                     console.log("index search: ", index);
                                     array.splice(index, 1, newNoti);
                                     setNotification(array);
+                                    route.params.updateNotification(array);
                                 })
                         }
                         else {
@@ -129,6 +130,7 @@ const Detail = ({ navigation, route }) => {
                             console.log("index search: ", index);
                             array.splice(index, 1, newNoti);
                             setNotification(array);
+                            route.params.updateNotification(array);
                         }
 
                     }
