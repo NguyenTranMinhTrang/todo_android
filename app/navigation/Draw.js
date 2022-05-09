@@ -52,12 +52,11 @@ const MyDrawer = ({ navigation, route }) => {
                 {/* render info user */}
                 <View style={{ paddingLeft: 20, marginTop: 15 }}>
                     <View>
-                        <Avatar.Image
-                            source={require('../assets/images/avatar.jpg')}
-                            size={100}
-                        />
                         <View>
-                            <Title style={{ ...FONTS.body3, color: COLORS.blue }}>{user?.email}</Title>
+                            <Title style={{ ...FONTS.h2, color: COLORS.black }}>Mail</Title>
+                        </View>
+                        <View>
+                            <Title style={{ ...FONTS.body3, color: COLORS.black }}>{user?.email}</Title>
                         </View>
                     </View>
                 </View>
@@ -66,13 +65,13 @@ const MyDrawer = ({ navigation, route }) => {
                         icon={() => (
                             <Icon
                                 name='exit-to-app'
-                                color={COLORS.blue}
+                                color={COLORS.black}
                                 size={30}
                             />
                         )}
                         label="Sign out"
                         labelStyle={{
-                            color: COLORS.blue,
+                            color: COLORS.black,
                             ...FONTS.body3
 
                         }}

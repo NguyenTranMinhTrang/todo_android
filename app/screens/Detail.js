@@ -62,6 +62,7 @@ const Detail = ({ navigation, route }) => {
 
 
     const onChange = (event, selectedDate) => {
+        setShow(Platform.OS === 'ios');
         const currentDate = selectedDate || date;
         setDate(currentDate);
         let tempDate = new Date(currentDate);
@@ -264,16 +265,18 @@ const Detail = ({ navigation, route }) => {
                         }}
                         onPress={() => setShow(false)}
                     >
-                        <DateTimePicker
-                            testID="dateTimePicker"
-                            value={date}
-                            mode={mode}
-                            display={Platform.OS === "ios" ? "spinner" : "default"}
-                            is24Hour={true}
-                            onChange={onChange}
-                            themeVariant="light"
-                            style={{ width: '100%', backgroundColor: 'white', height: 500 }}
-                        />
+                        {
+                            show && <DateTimePicker
+                                testID="dateTimePicker"
+                                value={date}
+                                mode={mode}
+                                display={Platform.OS === "ios" ? "spinner" : "default"}
+                                is24Hour={true}
+                                onChange={onChange}
+                                themeVariant="light"
+                                style={{ width: '100%', backgroundColor: 'white', height: 500 }}
+                            />
+                        }
                     </Pressable>
                 </Modal>
                 <TouchableOpacity

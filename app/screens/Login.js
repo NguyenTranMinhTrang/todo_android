@@ -28,6 +28,7 @@ const Login = ({ navigation }) => {
 
     React.useEffect(() => {
         if (Platform.OS === "android") {
+            //#FF573300
             StatusBar.setBackgroundColor('#FF573300');
             StatusBar.setTranslucent(true)
         }

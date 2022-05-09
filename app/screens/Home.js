@@ -7,7 +7,8 @@ import {
     TextInput,
     FlatList,
     Keyboard,
-    Animated
+    Animated,
+    Image
 } from "react-native";
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { Feather, Ionicons } from '@expo/vector-icons';
@@ -39,12 +40,14 @@ const Home = ({ navigation }) => {
                 let value = data.splice();
                 snapshot.forEach((childSnapshot) => {
                     const childKey = childSnapshot.key;
-                    const childData = childSnapshot.val();
-                    const data = {
-                        id: childKey,
-                        ...childData
+                    if (childKey !== "notifications") {
+                        const childData = childSnapshot.val();
+                        const data = {
+                            id: childKey,
+                            ...childData
+                        }
+                        value.push(data);
                     }
-                    value.push(data);
                 });
                 setData([...value]);
             }, {
@@ -141,64 +144,60 @@ const Home = ({ navigation }) => {
             <View
                 style={{
                     height: SIZES.height * 0.3,
-                    backgroundColor: COLORS.blue,
-                    borderBottomLeftRadius: 50,
-                    borderBottomRightRadius: 50,
-                    padding: SIZES.padding
+                    paddingHorizontal: SIZES.padding
                 }}
             >
-                {/*   Header Menu */}
                 <View
                     style={{
-                        height: 50,
-                        justifyContent: 'center',
-                    }}
-                >
-                    <TouchableOpacity
-                        onPress={() => navigation.openDrawer()}
-                    >
-                        <Feather name="menu" size={30} color="white" />
-                    </TouchableOpacity>
-                </View>
-
-                <View
-                    style={{
-                        marginTop: SIZES.padding,
-                        flexDirection: 'row'
+                        flexDirection: 'row',
+                        height: '100%'
                     }}
                 >
                     <View
                         style={{
-                            height: 75,
-                            width: 75,
-                            borderRadius: 75,
-                            backgroundColor: 'white',
-                            justifyContent: 'center',
-                            alignItems: 'center'
+                            flex: 0.2,
+                            paddingVertical: SIZES.padding
                         }}
                     >
                         <View
                             style={{
-                                height: 65,
-                                width: 65,
-                                borderRadius: 65,
-                                backgroundColor: 'yellow'
+                                height: 50,
+                                justifyContent: 'center',
                             }}
                         >
-
+                            <TouchableOpacity
+                                onPress={() => navigation.openDrawer()}
+                            >
+                                <Feather name="menu" size={30} color="black" />
+                            </TouchableOpacity>
                         </View>
                     </View>
 
                     <View
                         style={{
-                            justifyContent: 'center',
-                            marginLeft: SIZES.base
+                            height: '100%',
+                            flex: 0.8,
                         }}
                     >
-                        <Text style={{ ...FONTS.body3, color: COLORS.white }}>Hello</Text>
-                        <Text style={{ ...FONTS.body3, color: COLORS.white }}>{user?.email}</Text>
+                        <Image
+                            source={images.home}
+                            resizeMode="cover"
+                            style={{
+                                height: '100%',
+                                width: '100%'
+                            }}
+                        />
                     </View>
+
                 </View>
+
+                <Text style={{
+                    ...FONTS.h2,
+                    color: COLORS.black,
+                    position: 'absolute',
+                    top: SIZES.padding * 3,
+                    left: SIZES.padding
+                }}>Welcome !</Text>
             </View>
         )
     }
@@ -333,7 +332,7 @@ const Home = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#E8EAED'
+        backgroundColor: 'white'
     },
 });
 
