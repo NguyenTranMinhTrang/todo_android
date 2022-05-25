@@ -1,9 +1,10 @@
 import { auth, database } from "../firebase/firebase";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ref, set, push, remove, update, get, child } from "firebase/database";
+import { ref, set, push, remove, get, child } from "firebase/database";
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import { showSuccess, showError } from "../components/showMessage";
 
 
 
@@ -36,7 +37,11 @@ const signInUser = (email, password, callback) => {
                 }).catch((error) => {
                     console.error(error);
                 });
-            console.log("Notification from db: ", notifications);
+
+            if (!notifications) {
+                notifications = [];
+            }
+
             registerForPushNotificationsAsync().then(token => {
                 callback({
                     result: "success", data: {
@@ -97,9 +102,10 @@ const deleteTodo = (userId, item) => {
     const pathDelete = ref(database, 'todo/' + userId + "/" + item.id);
     remove(pathDelete)
         .then(() => {
-            console.log('delete success');
+            showSuccess("Delete Success!");
         })
         .catch((error) => {
+            showError("There is an error occured white delete todo!");
             console.log(error);
         })
 }
@@ -113,9 +119,10 @@ const updateTodo = (userId, data) => {
         time: data.time
     })
         .then(() => {
-            console.log('Update success');
+            showSuccess("Update Success!");
         })
         .catch((error) => {
+            showError("There is an error occured white update todo!");
             console.log(error);
         });
 }

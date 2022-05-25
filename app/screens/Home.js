@@ -26,6 +26,7 @@ const Home = ({ navigation }) => {
     const notification = React.useRef([]);
     const userId = React.useRef('');
 
+
     // fake data
     const colors = [COLORS.bubble, COLORS.blue, COLORS.green, COLORS.orange, COLORS.pink];
     React.useEffect(() => {
@@ -39,6 +40,7 @@ const Home = ({ navigation }) => {
             onValue(ref(database, 'todo/' + userData.id), (snapshot) => {
                 let value = data.splice();
                 snapshot.forEach((childSnapshot) => {
+                    console.log(childSnapshot);
                     const childKey = childSnapshot.key;
                     if (childKey !== "notifications") {
                         const childData = childSnapshot.val();
@@ -62,7 +64,7 @@ const Home = ({ navigation }) => {
                 notifications: notification.current
             })
                 .then(() => {
-                    console.log("update notification success");
+                    console.log("Update notification success");
                 })
                 .catch((error) => {
                     console.log(error);

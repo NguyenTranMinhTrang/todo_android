@@ -6,7 +6,7 @@ const showError = (message) => {
     showMessage({
         type: 'danger',
         icon: 'danger',
-        statusBarHeight: Platform.OS === "android" ? 20 : 0,
+        statusBarHeight: Platform.OS === "android" ? 20 : 10,
         message
     })
 }
@@ -15,7 +15,7 @@ const showSuccess = (message) => {
     showMessage({
         type: 'success',
         icon: 'success',
-        statusBarHeight: Platform.OS === "android" ? 20 : 0,
+        statusBarHeight: Platform.OS === "android" ? 20 : 10,
         message
     })
 }
