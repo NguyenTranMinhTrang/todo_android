@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Alert } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -6,6 +6,8 @@ import { useFonts } from 'expo-font';
 import FlashMessage from "react-native-flash-message";
 import 'react-native-gesture-handler';
 import * as Notifications from "expo-notifications";
+import NetInfo from "@react-native-community/netinfo";
+
 
 
 // screen
@@ -28,7 +30,9 @@ export default function App() {
     "Roboto-Bold": require('./app/assets/fonts/Roboto-Bold.ttf'),
     "Roboto-Regular": require('./app/assets/fonts/Roboto-Regular.ttf'),
     "Roboto-Light": require('./app/assets/fonts/Roboto-Light.ttf'),
-  })
+  });
+
+  const [connect, setConnect] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
 
@@ -39,6 +43,10 @@ export default function App() {
 
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
       console.log(response);
+    });
+
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setConnect(state.isConnected);
     });
 
     return () => {
@@ -60,9 +68,15 @@ export default function App() {
         }}
         initialRouteName='Login'
       >
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="MyDrawer" component={MyDrawer} />
-        <Stack.Screen name="SignIn" component={SignIn} />
+        <Stack.Screen name="Login">
+          {props => <Login {...props} internet={connect} />}
+        </Stack.Screen>
+        <Stack.Screen name="MyDrawer">
+          {props => <MyDrawer {...props} internet={connect} />}
+        </Stack.Screen>
+        <Stack.Screen name="SignIn">
+          {props => <SignIn {...props} internet={connect} />}
+        </Stack.Screen>
       </Stack.Navigator>
       <FlashMessage position="top" />
     </NavigationContainer>

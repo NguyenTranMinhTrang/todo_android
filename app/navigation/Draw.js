@@ -14,7 +14,7 @@ import { showSuccess } from '../components/showMessage';
 
 const Draw = createDrawerNavigator();
 
-const MyDrawer = ({ navigation, route }) => {
+const MyDrawer = ({ navigation, route, internet }) => {
 
     const [user, setUser] = React.useState(null);
 
@@ -91,7 +91,9 @@ const MyDrawer = ({ navigation, route }) => {
             }}
             drawerContent={drawerContent}
         >
-            <Draw.Screen name="Home" component={Home} />
+            <Draw.Screen name="Home">
+                {props => <Home {...props} internet={internet} />}
+            </Draw.Screen>
             <Draw.Screen name="Detail" component={Detail} />
         </Draw.Navigator>
 

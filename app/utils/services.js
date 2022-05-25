@@ -6,9 +6,6 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { showSuccess, showError } from "../components/showMessage";
 
-
-
-
 const signUpUser = (email, password, callback) => {
     createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -80,6 +77,19 @@ const setUserData = async (data) => {
     return AsyncStorage.setItem('user', data);
 }
 
+const getTodoData = () => {
+    return new Promise((resolve, reject) => {
+        AsyncStorage.getItem('todo').then(data => {
+            resolve(JSON.parse(data));
+        });
+    });
+}
+
+const setTodoData = async (data) => {
+    data = JSON.stringify(data);
+    return AsyncStorage.setItem('todo', data);
+}
+
 
 const addnewTask = (userId, data) => {
     const postListRef = ref(database, 'todo/' + userId);
@@ -141,7 +151,6 @@ const registerForPushNotificationsAsync = async () => {
             return;
         }
         token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log("Token from server: ", token);
     } else {
         alert('Must use physical device for Push Notifications');
     }
@@ -201,5 +210,7 @@ export {
     deleteTodo,
     updateTodo,
     schedulePushNotification,
-    cancelNotification
+    cancelNotification,
+    getTodoData,
+    setTodoData
 }

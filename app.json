@@ -1,6 +1,7 @@
 {
   "expo": {
-    "name": "pr3",
+    "name": "Todo App",
+    "icon": "./assets/icon.png",
     "slug": "pr3",
     "version": "1.0.0",
     "orientation": "portrait",

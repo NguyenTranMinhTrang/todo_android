@@ -16,7 +16,7 @@ import vadilator from "../utils/validation";
 import { showError, showSuccess } from "../components/showMessage";
 import { signInUser, setUserData, getUserData } from "../utils/services";
 
-const Login = ({ navigation }) => {
+const Login = ({ navigation, internet }) => {
 
     const [state, setState] = React.useState({
         email: '',
@@ -35,7 +35,6 @@ const Login = ({ navigation }) => {
 
         const checkUserState = async () => {
             let user = await getUserData();
-            console.log(user);
             if (user) {
                 navigation.navigate("MyDrawer", {
                     user
@@ -85,7 +84,12 @@ const Login = ({ navigation }) => {
     const handleLogin = () => {
         const isValid = validate();
         if (isValid) {
-            signInUser(email, password, signInCallBack);
+            if (internet) {
+                signInUser(email, password, signInCallBack);
+            }
+            else {
+                showError("Network error!");
+            }
         }
 
     }

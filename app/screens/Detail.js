@@ -7,15 +7,18 @@ import {
     TextInput,
     Modal,
     Pressable,
-    LogBox,
     StatusBar,
     Platform,
-    Alert
+    Alert,
+    LogBox
 } from "react-native";
-import { FONTS, images, SIZES, COLORS } from "../constants";
+import { FONTS, SIZES, COLORS } from "../constants";
 import { AntDesign, Fontisto, MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { updateTodo, schedulePushNotification, cancelNotification, setUserData, getUserData } from "../utils/services";
+import { showError } from "../components/showMessage";
+
+LogBox.ignoreLogs(['Non-serializable']);
 
 const Detail = ({ navigation, route }) => {
 
@@ -35,8 +38,7 @@ const Detail = ({ navigation, route }) => {
             StatusBar.setBackgroundColor('#FF573300');
             StatusBar.setTranslucent(true);
         }
-        LogBox.ignoreLogs(['Setting a timer for a long period of time']);
-        console.log("Route params :", route.params);
+
         let { userId, item, email, token, notification } = route.params;
         setTask({
             userId: userId,
@@ -79,25 +81,21 @@ const Detail = ({ navigation, route }) => {
             date: data.date,
             time: data.time
         }
-        updateTodo(task.userId, todo);
         schedulePushNotification(data.date, data.time, task.name)
             .then(result => {
                 if (result) {
+                    updateTodo(task.userId, todo);
                     let notice = notification.filter((data) => {
                         return data.idTodo == task.id;
                     });
                     const array = [...notification];
 
-                    console.log("notice: ", notice);
-
                     if (!notice[0] || notification.length == 0) {
-                        console.log("create a new noti");
                         const newNoti = {
                             idTodo: task.id,
                             idNoti: result.id,
                             time: result.deadline
                         }
-                        console.log("New notice: ", newNoti);
                         array.push(newNoti);
                         setNotification(array);
                         route.params.updateNotification(array);
@@ -107,28 +105,24 @@ const Detail = ({ navigation, route }) => {
                             cancelNotification(notice[0].idNoti)
                                 .then(() => {
                                     // set a new notification
-                                    console.log("cancle");
                                     const newNoti = {
                                         idTodo: notice[0].idTodo,
                                         idNoti: result.id,
                                         time: result.deadline
                                     }
                                     let index = array.indexOf(notice[0]);
-                                    console.log("index search: ", index);
                                     array.splice(index, 1, newNoti);
                                     setNotification(array);
                                     route.params.updateNotification(array);
                                 })
                         }
                         else {
-                            console.log("update a new notification");
                             const newNoti = {
                                 idTodo: notice[0].idTodo,
                                 idNoti: result.id,
                                 time: result.deadline
                             }
                             let index = array.indexOf(notice[0]);
-                            console.log("index search: ", index);
                             array.splice(index, 1, newNoti);
                             setNotification(array);
                             route.params.updateNotification(array);
@@ -137,7 +131,7 @@ const Detail = ({ navigation, route }) => {
                     }
                 }
                 else {
-                    Alert.alert("Error", "Set time error");
+                    showError("Set time error!");
                 }
             })
     }

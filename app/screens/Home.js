@@ -8,16 +8,20 @@ import {
     FlatList,
     Keyboard,
     Animated,
-    Image
+    Image,
+    Alert,
+    LogBox
 } from "react-native";
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { Feather, Ionicons } from '@expo/vector-icons';
-import { getUserData, addnewTask, deleteTodo } from "../utils/services";
+import { getUserData, addnewTask, deleteTodo, setTodoData, getTodoData } from "../utils/services";
 import { auth, database } from "../firebase/firebase";
 import { ref, set, push, onValue, update } from "firebase/database";
 import { Swipeable } from "react-native-gesture-handler";
 
-const Home = ({ navigation }) => {
+LogBox.ignoreLogs(['AsyncStorage']);
+
+const Home = ({ navigation, internet }) => {
 
     const [color, setColor] = React.useState(COLORS.blue);
     const [newTodo, setNewTodo] = React.useState('');
@@ -30,6 +34,7 @@ const Home = ({ navigation }) => {
     // fake data
     const colors = [COLORS.bubble, COLORS.blue, COLORS.green, COLORS.orange, COLORS.pink];
     React.useEffect(() => {
+
         const getUser = async () => {
             const userData = await getUserData();
             if (userData) {
@@ -37,29 +42,35 @@ const Home = ({ navigation }) => {
                 notification.current = [...userData.notifications];
                 userId.current = userData.id;
             }
-            onValue(ref(database, 'todo/' + userData.id), (snapshot) => {
-                let value = data.splice();
-                snapshot.forEach((childSnapshot) => {
-                    console.log(childSnapshot);
-                    const childKey = childSnapshot.key;
-                    if (childKey !== "notifications") {
-                        const childData = childSnapshot.val();
-                        const data = {
-                            id: childKey,
-                            ...childData
+
+            if (internet) {
+                onValue(ref(database, 'todo/' + userData.id), async (snapshot) => {
+                    let value = data.splice();
+                    snapshot.forEach((childSnapshot) => {
+                        const childKey = childSnapshot.key;
+                        if (childKey !== "notifications") {
+                            const childData = childSnapshot.val();
+                            const data = {
+                                id: childKey,
+                                ...childData
+                            }
+                            value.push(data);
                         }
-                        value.push(data);
-                    }
+                    });
+                    setData([...value]);
+                    await setTodoData([...value]);
+                }, {
+                    onlyOnce: false
                 });
-                setData([...value]);
-            }, {
-                onlyOnce: false
-            });
+            }
+            else {
+                let list = await getTodoData();
+                setData([...list]);
+            }
         }
         getUser();
 
         return () => {
-            console.log(userId.current);
             update(ref(database, 'todo/' + userId.current), {
                 notifications: notification.current
             })
@@ -76,7 +87,6 @@ const Home = ({ navigation }) => {
 
     const updateNotification = (newNotification) => {
         notification.current = [...newNotification];
-        console.log("notification.current from Home screen: ", notification.current);
     }
 
     const addNewTodo = () => {
@@ -86,12 +96,11 @@ const Home = ({ navigation }) => {
                 des: '',
                 time: '',
                 date: ''
-            }
+            };
             addnewTask(user.id, todo);
             setNewTodo('');
             Keyboard.dismiss();
         }
-
     }
 
     const onSelectItem = (item) => {
@@ -119,7 +128,14 @@ const Home = ({ navigation }) => {
         })
         return (
             <TouchableOpacity
-                onPress={() => deleteTodo(user.id, item)}
+                onPress={() => {
+                    if (internet) {
+                        deleteTodo(user.id, item);
+                    }
+                    else {
+                        Alert.alert("Error", "You have to connect internet to use this function!");
+                    }
+                }}
             >
                 <Animated.View
                     style={[{
@@ -192,14 +208,6 @@ const Home = ({ navigation }) => {
                     </View>
 
                 </View>
-
-                <Text style={{
-                    ...FONTS.h2,
-                    color: COLORS.black,
-                    position: 'absolute',
-                    top: SIZES.padding * 3,
-                    left: SIZES.padding
-                }}>Welcome !</Text>
             </View>
         )
     }
@@ -217,7 +225,14 @@ const Home = ({ navigation }) => {
                         alignItems: 'center'
                     }}
 
-                    onPress={() => onSelectItem(item)}
+                    onPress={() => {
+                        if (internet) {
+                            onSelectItem(item);
+                        }
+                        else {
+                            Alert.alert("Error", "You have to connect internet to use this function!");
+                        }
+                    }}
                 >
                     <Text style={{ ...FONTS.body3, flex: 1, color: COLORS.white }}>{item.name}</Text>
                     <View
@@ -279,7 +294,14 @@ const Home = ({ navigation }) => {
                             alignItems: 'center'
                         }}
 
-                        onPress={addNewTodo}
+                        onPress={() => {
+                            if (internet) {
+                                addNewTodo();
+                            }
+                            else {
+                                Alert.alert("Error", "You have to connect internet to use this function!");
+                            }
+                        }}
                     >
                         <Ionicons name="add-sharp" size={50} color="white" />
                     </TouchableOpacity>

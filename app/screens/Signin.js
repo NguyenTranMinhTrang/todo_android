@@ -16,7 +16,7 @@ import vadilator from "../utils/validation";
 import { showError, showSuccess } from "../components/showMessage";
 import { signUpUser } from "../utils/services";
 
-const SignIn = ({ navigation }) => {
+const SignIn = ({ navigation, internet }) => {
 
     const [state, setState] = React.useState({
         email: '',
@@ -51,7 +51,6 @@ const SignIn = ({ navigation }) => {
         })
 
         if (error) {
-            console.log(error);
             showError(error);
             return false;
         }
@@ -63,12 +62,20 @@ const SignIn = ({ navigation }) => {
             showSuccess("Sign up successfully!");
             navigation.navigate("Login");
         }
+        else {
+            showError("Your email is already in use");
+        }
     }
 
     const signIn = () => {
         const isValid = validate();
         if (isValid) {
-            signUpUser(email, password, signUpCallback);
+            if (internet) {
+                signUpUser(email, password, signUpCallback);
+            }
+            else {
+                showError("Network error!");
+            }
         }
     }
 
