@@ -52,6 +52,7 @@ export default function App() {
     return () => {
       Notifications.removeNotificationSubscription(notificationListener.current);
       Notifications.removeNotificationSubscription(responseListener.current);
+      unsubscribe();
     };
   }, []);
 

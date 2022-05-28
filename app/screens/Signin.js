@@ -226,7 +226,7 @@ const SignIn = ({ navigation, internet }) => {
                     }}
                     onPress={signIn}
                 >
-                    <Text style={{ ...FONTS.h2, color: COLORS.white }}>Sign In</Text>
+                    <Text style={{ ...FONTS.h2, color: COLORS.white }}>Sign Up</Text>
                 </TouchableOpacity>
             </KeyboardAvoidingView>
         )

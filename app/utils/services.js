@@ -60,6 +60,10 @@ const clearUserData = async () => {
     return AsyncStorage.removeItem('user');
 }
 
+const clearTodoData = async () => {
+    return AsyncStorage.removeItem('todo');
+}
+
 const handleSignOut = () => {
     return auth.signOut();
 }
@@ -212,5 +216,6 @@ export {
     schedulePushNotification,
     cancelNotification,
     getTodoData,
-    setTodoData
+    setTodoData,
+    clearTodoData
 }

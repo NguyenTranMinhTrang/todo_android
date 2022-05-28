@@ -9,7 +9,7 @@ import { Avatar, Title, Drawer } from 'react-native-paper';
 import { FONTS, images, SIZES, COLORS } from "../constants";
 import { DrawerItem } from '@react-navigation/drawer';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { clearUserData, handleSignOut } from '../utils/services';
+import { clearUserData, handleSignOut, clearTodoData } from '../utils/services';
 import { showSuccess } from '../components/showMessage';
 
 const Draw = createDrawerNavigator();
@@ -34,8 +34,9 @@ const MyDrawer = ({ navigation, route, internet }) => {
         )
     }
 
-    const signOut = () => {
-        clearUserData();
+    const signOut = async () => {
+        await clearUserData();
+        await clearTodoData();
         handleSignOut()
             .then(() => {
                 showSuccess("Sign Out Successfully!");

@@ -101,33 +101,19 @@ const Detail = ({ navigation, route }) => {
                         route.params.updateNotification(array);
                     }
                     else {
-                        if (result.deadline < notice[0].time) {
-                            cancelNotification(notice[0].idNoti)
-                                .then(() => {
-                                    // set a new notification
-                                    const newNoti = {
-                                        idTodo: notice[0].idTodo,
-                                        idNoti: result.id,
-                                        time: result.deadline
-                                    }
-                                    let index = array.indexOf(notice[0]);
-                                    array.splice(index, 1, newNoti);
-                                    setNotification(array);
-                                    route.params.updateNotification(array);
-                                })
-                        }
-                        else {
-                            const newNoti = {
-                                idTodo: notice[0].idTodo,
-                                idNoti: result.id,
-                                time: result.deadline
-                            }
-                            let index = array.indexOf(notice[0]);
-                            array.splice(index, 1, newNoti);
-                            setNotification(array);
-                            route.params.updateNotification(array);
-                        }
-
+                        cancelNotification(notice[0].idNoti)
+                            .then(() => {
+                                // set a new notification
+                                const newNoti = {
+                                    idTodo: notice[0].idTodo,
+                                    idNoti: result.id,
+                                    time: result.deadline
+                                }
+                                let index = array.indexOf(notice[0]);
+                                array.splice(index, 1, newNoti);
+                                setNotification(array);
+                                route.params.updateNotification(array);
+                            })
                     }
                 }
                 else {
