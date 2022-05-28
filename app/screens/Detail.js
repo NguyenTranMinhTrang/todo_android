@@ -19,6 +19,7 @@ import { updateTodo, schedulePushNotification, cancelNotification, setUserData, 
 import { showError } from "../components/showMessage";
 
 LogBox.ignoreLogs(['Non-serializable']);
+LogBox.ignoreLogs(['Setting a timer']);
 
 const Detail = ({ navigation, route }) => {
 
@@ -250,7 +251,7 @@ const Detail = ({ navigation, route }) => {
                                 testID="dateTimePicker"
                                 value={date}
                                 mode={mode}
-                                display={Platform.OS === "ios" ? "spinner" : "default"}
+                                display="spinner"
                                 is24Hour={true}
                                 onChange={onChange}
                                 themeVariant="light"
